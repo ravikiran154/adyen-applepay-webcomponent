@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Apple Pay Web Component</title>
+  <script src="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.52.0/adyen.js"></script>
+  <link rel="stylesheet" href="https://checkoutshopper-test.adyen.com/checkoutshopper/sdk/5.52.0/adyen.css" />
+</head>
+<body>
+<h1>Apple Pay Web Component Test</h1>
+<div id="applepay-container"></div>
+
+<script>
+  async function initApplePay() {
+    const paymentMethodsRes = await fetch("/paymentMethods", {
+      method: "POST"
+    });
+    const paymentMethods = await paymentMethodsRes.json();
+
+    const checkout = await AdyenCheckout({
+      environment: "test",
+      clientKey: "test_V7XE7I3EU5FWZC4POTLHJIK7OAFQ4SVX", // Replace with your test client key
+      paymentMethodsResponse: paymentMethods,
+      onSubmit: async (state, component) => {
+        const response = await fetch("/payments", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(state.data)
+        });
+        const result = await response.json();
+        console.log("Payment result:", result);
+      }
+    });
+
+    const applePay = checkout.create("applepay", {
+      amount: { value: 1000, currency: "USD" },
+      countryCode: "US",
+      configuration: {
+        merchantName: "Discovery_BEAM_INT_TEST",
+        merchantId: "000000000304956"
+      },
+      onSubmit: (state, component) => {
+
+        checkout.options.onSubmit(state, component);
+      },
+      onAuthorized: (data, actions) => {
+        console.log('Authorized event', data);
+        actions.resolve();
+      }
+    });
+
+    applePay.mount("#applepay-container");
+  }
+
+  initApplePay();
+</script>
+</body>
+</html>
