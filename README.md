@@ -1,0 +1,1 @@
+# adyen-applepay-webcomponent
