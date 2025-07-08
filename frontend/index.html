@@ -17,11 +17,14 @@
     });
     const paymentMethods = await paymentMethodsRes.json();
 
+
     const checkout = await AdyenCheckout({
       environment: "test",
       clientKey: "test_V7XE7I3EU5FWZC4POTLHJIK7OAFQ4SVX", // Replace with your test client key
       paymentMethodsResponse: paymentMethods,
+
       onSubmit: async (state, component) => {
+        console.log('onSubmit event1');
         const response = await fetch("/payments", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -39,13 +42,9 @@
         merchantName: "Discovery_BEAM_INT_TEST",
         merchantId: "000000000304956"
       },
-      onSubmit: (state, component) => {
-
+      onSubmit: (state, component, actions) => {
+        console.log('onSubmit event');
         checkout.options.onSubmit(state, component);
-      },
-      onAuthorized: (data, actions) => {
-        console.log('Authorized event', data);
-        actions.resolve();
       }
     });
 

@@ -40,10 +40,17 @@ app.post("/paymentMethods", async (req, res) => {
   }
 });
 
+
+
 app.post("/payments", async (req, res) => {
   try {
     const response = await adyen.post("/payments", {
       ...req.body,
+      amount: {
+        currency: "USD",
+        value: 1000
+      },
+      reference: `payment-${Date.now()}`,
       merchantAccount: MERCHANT_ACCOUNT
     });
     res.json(response.data);
